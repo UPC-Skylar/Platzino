@@ -1,8 +1,10 @@
 ﻿using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
+using System.Formats.Tar;
 
 System.Random r = new System.Random();
 int totalJugador = 0, totalDealer = 0, platziCoins = 0, numeroJuego = 0, opcMenu;
+int fichasApostadas = 0;
 //Generamos aleatoriamente el dinero del jugador entre 100 - 1000 USD
 //r.NextDouble() * (500 - 100 + 100) + 100;
 double dineroJugador = r.Next(100,500);
@@ -74,34 +76,47 @@ void tarifa_logica_PlatziCoins()
 
     if (dineroJugador < costoPlatziCoins) {
         Console.WriteLine("Monto de dinero insuficiente");
-        puedeJugar = false;
+        tarifa_logica_PlatziCoins();
     } else
     {
         dineroJugador -= costoPlatziCoins;
     }
 }
 
+int validaFichasApostadas()
+{
+    int fichasApostadas = 0;
+    do
+    {
+        Console.WriteLine("¿Cuantas fichas deseas apostar?");
+        fichasApostadas = Convert.ToInt32(Console.ReadLine());
+    } while (fichasApostadas <= 0);
+    return fichasApostadas;
+}
+
 void iniciarJuego(){
-        //Reiniciamos los contadores en cada juego
-        totalJugador = 0;
+    //Reiniciamos los contadores en cada juego
+    totalJugador = 0;
         totalDealer = 0;
         Console.WriteLine($"\n--- JUEGO {numeroJuego} ---");
+        fichasApostadas = validaFichasApostadas();
         Elegir_Carta_Jugador();
         Console.WriteLine($"\nEl dealer tiene {totalDealer} !");
         Console.WriteLine($"Usted tiene {totalJugador} !\n");
         if (totalJugador > totalDealer && totalJugador < 22)
         {
             Console.WriteLine("Ganaste el juego, felicidades\n");
+            platziCoins += fichasApostadas;
         }
         else if (totalJugador >= 22)
         {
             Console.WriteLine("Te pasaste de 21, perdiste el juego ctm\n");
-            platziCoins--;
+            platziCoins -= fichasApostadas;
         }
         else if (totalJugador <= totalDealer)
         {
             Console.WriteLine("Perdiste el juego, lo sentimos\n");
-            platziCoins--;
+            platziCoins -= fichasApostadas;
         }
         Console.WriteLine($"PlatziCoins: {platziCoins}");
 
@@ -146,9 +161,9 @@ void menu()
             {
                 Console.WriteLine($"\n\nHola {nombre}, bienvenido a BlackJack!!");
                 tarifa_logica_PlatziCoins();
-                for (int i = 0; i < platziCoins; i++) {
+                for (int i = 1; i <= platziCoins; i++) {
                     //validacion
-                    numeroJuego = i + 1;
+                    numeroJuego = i;
                     iniciarJuego();
                     do
                     {
@@ -185,5 +200,4 @@ while (true) {
     } else {
         break;
     }
-    
 }
